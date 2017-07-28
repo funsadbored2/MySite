@@ -12,6 +12,16 @@ public class UserVo {
 	
 	
 	
+	public UserVo(int no, String name, String email, String gender) {
+		super();
+		this.no = no;
+		this.name = name;
+		this.email = email;
+		this.gender = gender;
+	}
+
+
+
 	public UserVo(String name, String email, String pass, String gender) {
 		super();
 		this.name = name;

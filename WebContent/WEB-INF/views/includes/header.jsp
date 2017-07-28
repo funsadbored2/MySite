@@ -3,8 +3,8 @@
 
 <%
 	UserVo authUser = (UserVo)session.getAttribute("authUser");
-	String name = authUser.getName()
 	
+	/* String name = authUser.getName(); */
 
 %>
 
@@ -22,9 +22,9 @@
 							%>
 		<!-- 로그인 후 -->
 
-		<li><a href="">회원정보수정</a></li>
-		<li><a href="">로그아웃</a></li>
-		<li>황일영님 안녕하세요^^;</li>
+		<li><a href="/mysite/user?a=modifyform">회원정보수정</a></li>
+		<li><a href="/mysite/user?a=logout">로그아웃</a></li>
+		<li><%=authUser.getName()%>님 안녕하세요^^;</li>
 			<%} %>
 	</ul>
 </div>

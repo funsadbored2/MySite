@@ -94,14 +94,14 @@ public class UserDao {
 			rs = pstmt.executeQuery();
 
 			// 4.결과처리
-			while(rs.next()) {
-			int no = rs.getInt("no");
-			String name = rs.getString("name");
+			while (rs.next()) {
+				int no = rs.getInt("no");
+				String name = rs.getString("name");
 
-			vo = new UserVo();
+				vo = new UserVo();
 
-			vo.setNo(no);
-			vo.setName(name);
+				vo.setNo(no);
+				vo.setName(name);
 			}
 
 		} catch (ClassNotFoundException e) {
@@ -136,6 +136,81 @@ public class UserDao {
 
 			}
 
+		}
+		return vo;
+	}
+
+	public UserVo getUser(int no) {
+
+		Connection conn = null;
+
+		PreparedStatement pstmt = null;
+
+		ResultSet rs = null;
+
+		UserVo vo = null;
+		try {
+
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			conn = DriverManager.getConnection(url, "webdb", "webdb");
+
+			System.out.println("접속되었습니다.");
+
+			// 3. SQL문 준비 / 바인딩 / 실행
+
+			String query = "select no, name, email, gender from USERS where no= ?";
+			pstmt = conn.prepareStatement(query);
+
+			pstmt.setInt(1, no);
+
+			rs = pstmt.executeQuery();
+
+			// 4.결과처리
+			while (rs.next()) {
+				no = rs.getInt("no");
+				String name = rs.getString("name");
+				String email = rs.getString("email");
+				String gender = rs.getString("gender");
+
+				vo = new UserVo(no, name, email, gender);
+				System.out.println(vo.toString());	
+			}
+
+		} catch (ClassNotFoundException e) {
+
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
+
+		} catch (SQLException e) {
+
+			System.out.println("error:" + e);
+
+		} finally {
+
+			// 5. 자원정리
+
+			try {
+
+				if (pstmt != null) {
+
+					pstmt.close();
+
+				}
+
+				if (conn != null) {
+
+					conn.close();
+
+				}
+
+			} catch (SQLException e) {
+
+				System.out.println("error:" + e);
+
+			}
 		}
 		return vo;
 	}

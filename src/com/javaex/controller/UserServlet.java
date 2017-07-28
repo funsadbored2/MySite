@@ -64,11 +64,11 @@ public class UserServlet extends HttpServlet {
 			UserVo vo = dao.getUser(email, pass);
 
 			if (vo == null) {
-				
+
 				System.out.println("실패");
-				
+
 				response.sendRedirect("/mysite/user?a=loginform&result=fail");
-				
+
 			} else {
 				System.out.println("성공");
 				HttpSession session = request.getSession(true);
@@ -77,6 +77,48 @@ public class UserServlet extends HttpServlet {
 				response.sendRedirect("/mysite/main");
 				return;
 			}
+		} else if ("logout".equals(actionName)) {
+
+			System.out.println("로그아웃 들어옴");
+
+			HttpSession session = request.getSession();
+			session.removeAttribute("authUser");
+
+			session.invalidate();
+
+			response.sendRedirect("/mysite/main");
+
+		} else if ("modifyform".equals(actionName)) {
+
+			System.out.println("수정폼 들어옴");
+
+			HttpSession session = request.getSession();
+			session.getAttribute("authUser");
+			UserVo authUser = (UserVo) session.getAttribute("authUser");
+			int no = authUser.getNo();
+
+			UserDao dao = new UserDao();
+			UserVo vo = dao.getUser(no);
+			System.out.println(vo.toString());
+			
+			request.setAttribute("userVo", vo);
+			
+			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/modifyform.jsp");
+			rd.forward(request, response);
+			
+		} else if ("modify".equals(actionName)) {
+			System.out.println("수정 들어옴");
+
+			/* int no = Integer.parseInt(request.getParameter("no")); */
+
+			/*
+			 * HttpSession session = request.getSession(); session.getAttribute("authUser");
+			 * UserVo authUser = (UserVo)session.getAttribute("authUser"); int no =
+			 * authUser.getNo();
+			 * 
+			 * UserDao dao = new UserDao(); UserVo vo = dao.getUser(no);
+			 * System.out.println(vo.toString());
+			 */
 		} else {
 
 			response.sendRedirect("/mysite/main");
