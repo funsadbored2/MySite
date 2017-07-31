@@ -15,6 +15,7 @@
 		
 		<jsp:include page="/WEB-INF/views/includes/navigation.jsp"></jsp:include>
 		
+		
 		<div id="wrapper">
 			<div id="content">
 				<div id="user">

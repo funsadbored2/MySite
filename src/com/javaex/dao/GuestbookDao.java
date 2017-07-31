@@ -5,18 +5,98 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.javaex.vo.UserVo;
+import com.javaex.vo.GuestbookVo;
 
-public class UserDao {
+public class GuestbookDao {
 
-	public int insert(UserVo vo) {
+	public List<GuestbookVo> getList() {
+
+		Connection conn = null;
+
+		PreparedStatement pstmt = null;
+
+		ResultSet rs = null;
+
+		List<GuestbookVo> list = new ArrayList<GuestbookVo>();
+
+		try {
+
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			conn = DriverManager.getConnection(url, "webdb", "webdb");
+
+			System.out.println("접속되었습니다.");
+
+			// 3. SQL문 준비 / 바인딩 / 실행
+
+			String query = "SELECT NO, " + "NAME, " + "CONTENT, " + "REG_DATE " + "FROM GUESTBOOK";
+			pstmt = conn.prepareStatement(query);
+
+			rs = pstmt.executeQuery();
+
+			// 4.결과처리
+
+			while (rs.next()) {
+
+				GuestbookVo vo = new GuestbookVo();
+
+				vo.setNo(rs.getInt("NO"));
+				vo.setName(rs.getString("NAME"));
+				vo.setContent(rs.getString("CONTENT"));
+				vo.setRegdate(rs.getString("REG_DATE"));
+
+				list.add(vo);
+			}
+
+		} catch (ClassNotFoundException e) {
+
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
+
+		} catch (SQLException e) {
+
+			System.out.println("error:" + e);
+
+		} finally {
+
+			// 5. 자원정리
+
+			try {
+
+				if (pstmt != null) {
+
+					pstmt.close();
+
+				}
+
+				if (conn != null) {
+
+					conn.close();
+
+				}
+
+			} catch (SQLException e) {
+
+				System.out.println("error:" + e);
+
+			}
+
+		}
+
+		return list;
+	}
+
+	public int add(GuestbookVo vo) {
 
 		// 0. import java.sql.*;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		int count = 0;
-
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -27,19 +107,17 @@ public class UserDao {
 
 			System.out.println("접속되었습니다.");
 			// 3. SQL문 준비 / 바인딩 / 실행
-			String query = "INSERT INTO USERS VALUES(SEQ_USERS_NUMBER.NEXTVAL,?,?,?,?)";
+			String query = "INSERT INTO GUESTBOOK\r\n" + "VALUES(SEQ_BOOKGUEST1.NEXTVAL,?,?,?,SYSDATE)";
 			pstmt = conn.prepareStatement(query);
 
 			pstmt.setString(1, vo.getName());
-			pstmt.setString(2, vo.getEmail());
-			pstmt.setString(3, vo.getPass());
-			pstmt.setString(4, vo.getGender());
+			pstmt.setString(2, vo.getPassword());
+			pstmt.setString(3, vo.getContent());
 
 			count = pstmt.executeUpdate();
 
-			System.out.println(count + "건 처리");
 			// 4.결과처리
-
+			System.out.println(count + "건 처리");
 		} catch (ClassNotFoundException e) {
 			System.out.println("error:드라이브 로딩 실패" + e);
 		} catch (SQLException e) {
@@ -59,22 +137,20 @@ public class UserDao {
 			// 5. 자원정리
 
 		}
-
 		return count;
 	}
 
-	public UserVo getUser(String email, String pass) {
+	public void delete(String pw, int no) {
 
 		Connection conn = null;
 
 		PreparedStatement pstmt = null;
 
-		ResultSet rs = null;
-
-		UserVo vo = null;
+		int num = no;
 		try {
 
 			// 1. JDBC 드라이버 (Oracle) 로딩
+
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 
 			// 2. Connection 얻어오기
@@ -84,25 +160,85 @@ public class UserDao {
 			System.out.println("접속되었습니다.");
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-
-			String query = "select no, name from USERS where email =? and password = ?";
+			String query = "DELETE FROM GUESTBOOK " + "WHERE NO = ?" + " AND PASSWORD = ?";
 			pstmt = conn.prepareStatement(query);
 
-			pstmt.setString(1, email);
-			pstmt.setString(2, pass);
+			pstmt.setInt(1, num);
+			pstmt.setString(2, pw);
+			int count = pstmt.executeUpdate();
 
-			rs = pstmt.executeQuery();
-
+			System.out.println(count + "건 처리");
 			// 4.결과처리
-			while (rs.next()) {
-				int no = rs.getInt("no");
-				String name = rs.getString("name");
 
-				vo = new UserVo();
+		} catch (ClassNotFoundException e) {
 
-				vo.setNo(no);
-				vo.setName(name);
+			System.out.println("error: 드라이버 로딩 실패 - " + e);
+
+		} catch (SQLException e) {
+
+			System.out.println("error: " + e);
+
+		} finally {
+
+			// 5. 자원정리
+
+			try {
+
+				if (pstmt != null) {
+
+					pstmt.close();
+
+				}
+
+				if (conn != null) {
+
+					conn.close();
+
+				}
+
+			} catch (SQLException e) {
+
+				System.out.println("error:" + e);
+
 			}
+		}
+
+	}
+	public int update(GuestbookVo vo) {
+		
+		Connection conn = null;
+
+		PreparedStatement pstmt = null;
+
+		int count = -1;
+
+		int no = vo.getNo();
+		String name = vo.getName();
+		String pw = vo.getPassword();
+		String con = vo.getContent();
+
+		try {
+
+			// 1. JDBC 드라이버 (Oracle) 로딩
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			// 2. Connection 얻어오기
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			conn = DriverManager.getConnection(url, "webdb", "webdb");
+
+			System.out.println("접속되었습니다");
+
+			// 3. SQL문 준비 / 바인딩 / 실행
+			String query = "UPDATE GUESTBOOK " + "SET NAME = ? " + ",PASSWORD= ? " + ",CONTENT= ? WHERE NO = ?";
+			pstmt = conn.prepareStatement(query);
+
+			pstmt.setString(1, name);
+			pstmt.setString(2, pw);
+			pstmt.setString(3, con);
+			pstmt.setInt(4, no);
+			count = pstmt.executeUpdate();
+			System.out.println(count + "건 처리");
+			// 4.결과처리
 
 		} catch (ClassNotFoundException e) {
 
@@ -137,151 +273,9 @@ public class UserDao {
 			}
 
 		}
-		return vo;
-	}
-
-	public UserVo getUser(int no) {
-
-		Connection conn = null;
-
-		PreparedStatement pstmt = null;
-
-		ResultSet rs = null;
-
-		UserVo vo = null;
-		try {
-
-			// 1. JDBC 드라이버 (Oracle) 로딩
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-
-			// 2. Connection 얻어오기
-			String url = "jdbc:oracle:thin:@localhost:1521:xe";
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
-
-			System.out.println("접속되었습니다.");
-
-			// 3. SQL문 준비 / 바인딩 / 실행
-
-			String query = "select no, name, email, gender from USERS where no= ?";
-			pstmt = conn.prepareStatement(query);
-
-			pstmt.setInt(1, no);
-
-			rs = pstmt.executeQuery();
-
-			// 4.결과처리
-			while (rs.next()) {
-				no = rs.getInt("no");
-				String name = rs.getString("name");
-				String email = rs.getString("email");
-				String gender = rs.getString("gender");
-
-				vo = new UserVo(no, name, email, gender);
-				System.out.println(vo.toString());
-			}
-
-		} catch (ClassNotFoundException e) {
-
-			System.out.println("error: 드라이버 로딩 실패 - " + e);
-
-		} catch (SQLException e) {
-
-			System.out.println("error:" + e);
-
-		} finally {
-
-			// 5. 자원정리
-
-			try {
-
-				if (pstmt != null) {
-
-					pstmt.close();
-
-				}
-
-				if (conn != null) {
-
-					conn.close();
-
-				}
-
-			} catch (SQLException e) {
-
-				System.out.println("error:" + e);
-
-			}
-		}
-		return vo;
-	}
-
-	public int update(UserVo vo) {
-
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-
-		int count = 0;
-
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-
-			// connection 얻어오기
-
-			String url = "jdbc:oracle:thin:@localhost:1521:xe";
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
-			System.out.println("접속 성공");
-
-			
-			// sql문 준지 / 바인딩/ 실행
-			if(vo.getPass() == "") {
-
-			String query = "update USERS " + "set name = ?,"
-					+ "gender = ?" + " where no = ?";
-			pstmt = conn.prepareStatement(query);
-
-			pstmt.setString(1, vo.getName());
-			pstmt.setString(2, vo.getGender());
-			pstmt.setInt(3, vo.getNo());
-
-			count = pstmt.executeUpdate();
-			
-			} else {
-				String query = "update USERS " + "set name = ?," + "password = ?,"
-						+ "gender = ?" + " where no = ?";
-				pstmt = conn.prepareStatement(query);
-
-				pstmt.setString(1, vo.getName());
-				pstmt.setString(2, vo.getPass());
-				pstmt.setString(3, vo.getGender());
-				pstmt.setInt(4, vo.getNo());
-
-				count = pstmt.executeUpdate();
-			}
-
-			System.out.println(count + "건 처리");
-			// 결과처리
-		} catch (ClassNotFoundException e) {
-			System.out.println("error:드라이브 로딩 실패" + e);
-		} catch (SQLException e) {
-			System.out.println("error: " + e);
-		} finally {
-
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				System.out.println("error: " + e);
-			}
-			// 5. 자원정리
-
-		}
 
 		return count;
-
+		
 	}
 
 }

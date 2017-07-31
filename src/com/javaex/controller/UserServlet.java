@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import com.javaex.dao.UserDao;
 import com.javaex.vo.UserVo;
 
+
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -62,21 +63,22 @@ public class UserServlet extends HttpServlet {
 
 			UserDao dao = new UserDao();
 			UserVo vo = dao.getUser(email, pass);
+					//비밀번호, 이메일 틀릴 시 실패가 나오게 만듬.
+					if (vo == null) {
+		
+						System.out.println("실패");
+		
+						response.sendRedirect("/mysite/user?a=loginform&result=fail");
+		
+					} else {
+						System.out.println("성공");
+						HttpSession session = request.getSession(true);
+						session.setAttribute("authUser", vo);
+		
+						response.sendRedirect("/mysite/main");
+						return;
+					}
 
-			if (vo == null) {
-
-				System.out.println("실패");
-
-				response.sendRedirect("/mysite/user?a=loginform&result=fail");
-
-			} else {
-				System.out.println("성공");
-				HttpSession session = request.getSession(true);
-				session.setAttribute("authUser", vo);
-
-				response.sendRedirect("/mysite/main");
-				return;
-			}
 		} else if ("logout".equals(actionName)) {
 
 			System.out.println("로그아웃 들어옴");
@@ -93,32 +95,48 @@ public class UserServlet extends HttpServlet {
 			System.out.println("수정폼 들어옴");
 
 			HttpSession session = request.getSession();
-			session.getAttribute("authUser");
 			UserVo authUser = (UserVo) session.getAttribute("authUser");
 			int no = authUser.getNo();
 
 			UserDao dao = new UserDao();
 			UserVo vo = dao.getUser(no);
 			System.out.println(vo.toString());
-			
+
 			request.setAttribute("userVo", vo);
 			
+
 			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/modifyform.jsp");
 			rd.forward(request, response);
-			
+
 		} else if ("modify".equals(actionName)) {
+			
 			System.out.println("수정 들어옴");
-
-			/* int no = Integer.parseInt(request.getParameter("no")); */
-
-			/*
-			 * HttpSession session = request.getSession(); session.getAttribute("authUser");
-			 * UserVo authUser = (UserVo)session.getAttribute("authUser"); int no =
-			 * authUser.getNo();
-			 * 
-			 * UserDao dao = new UserDao(); UserVo vo = dao.getUser(no);
-			 * System.out.println(vo.toString());
-			 */
+			
+			//바꿀 데이터를 구분하기 위해서 세션에서 번호를 베온다.
+			HttpSession session = request.getSession();
+			UserVo authUser = (UserVo) session.getAttribute("authUser");
+			
+			UserVo vo = new UserVo();
+			String name = request.getParameter("name");
+			String pass = request.getParameter("password");
+			String gender = request.getParameter("gender");
+			
+			authUser.setName(name);
+			
+			int no = authUser.getNo();
+			
+			vo.setNo(no);
+			vo.setName(name);
+			vo.setPass(pass);
+			vo.setGender(gender);
+			
+			UserDao dao = new UserDao();
+			
+			dao.update(vo);
+			
+			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/main/index.jsp");
+			rd.forward(request, response);
+			
 		} else {
 
 			response.sendRedirect("/mysite/main");
