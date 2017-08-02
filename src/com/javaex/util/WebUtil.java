@@ -6,6 +6,9 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.javaex.vo.UserVo;
 
 public class WebUtil {
 	
@@ -21,6 +24,14 @@ public class WebUtil {
 		
 		response.sendRedirect(url);
 		
+	}
+	
+	public static UserVo http(HttpServletRequest request) {
+		
+		HttpSession session = request.getSession();
+		UserVo authUser = (UserVo) session.getAttribute("authUser");
+		
+		return authUser;
 	}
 
 }
