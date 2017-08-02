@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.javaex.dao.GuestbookDao;
+import com.javaex.util.WebUtil;
 import com.javaex.vo.GuestbookVo;
 
 @WebServlet("/guestbook")
@@ -40,16 +41,15 @@ public class GuestbookServlet extends HttpServlet {
 			GuestbookVo vo = new GuestbookVo(name, pass, content);
 			GuestbookDao dao = new GuestbookDao();
 			dao.add(vo);
-
-			response.sendRedirect("/mysite/guestbook");
+		
+			WebUtil.redirect(response, "/mysite/guestbook");
 			
 		}	else if ("deleteform".equals(actionName)) {
 
 			// delete전 비밀번호 확인하는 부분으로 사용자 입력 값 가져오기
 			System.out.println("deleteform으로 들어옴");
 
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/guestbook/deleteform.jsp");
-			rd.forward(request, response);
+			WebUtil.forward(request, response, "/WEB-INF/views/guestbook/deleteform.jsp");
 
 		} else if ("delete".equals(actionName)) {
 			GuestbookDao dao = new GuestbookDao();
@@ -59,8 +59,8 @@ public class GuestbookServlet extends HttpServlet {
 
 			dao.delete(pw, no);
 
-			response.sendRedirect("/mysite/guestbook");
-
+			WebUtil.redirect(response, "/mysite/guestbook");
+			
 		} else {
 
 			System.out.println("리스트로");
@@ -70,9 +70,7 @@ public class GuestbookServlet extends HttpServlet {
 
 			request.setAttribute("list", list);
 
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/guestbook/list.jsp");
-			rd.forward(request, response);
-
+			WebUtil.forward(request, response, "/WEB-INF/views/guestbook/list.jsp");
 		}
 	}
 

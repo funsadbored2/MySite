@@ -1,8 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<% 
-int no =  Integer.parseInt(request.getParameter("no"));
-%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -14,10 +12,9 @@ int no =  Integer.parseInt(request.getParameter("no"));
 </head>
 <body>
 
+	<c:import url="/WEB-INF/views/includes/header.jsp"></c:import>
 
-	<jsp:include page="/WEB-INF/views/includes/header.jsp"></jsp:include>
-
-	<jsp:include page="/WEB-INF/views/includes/navigation.jsp"></jsp:include>
+	<c:import url="/WEB-INF/views/includes/navigation.jsp"></c:import>
 
 
 	<div id="wrapper">
@@ -26,7 +23,7 @@ int no =  Integer.parseInt(request.getParameter("no"));
 
 				<form method="post" action="/mysite/guestbook">
 				<input type = "hidden" name = "a" value = "delete">
-				<input type = "hidden" name = "no" value = "<%=no%>">
+				<input type = "hidden" name = "no" value = "${param.no}">
 
 					<label>비밀번호</label> <input type="password" name="password">
 					<input type="submit" value="확인">
@@ -39,7 +36,7 @@ int no =  Integer.parseInt(request.getParameter("no"));
 	</div>
 	<!-- /wrapper -->
 
-	<jsp:include page="/WEB-INF/views/includes/footer.jsp"></jsp:include>
+	<c:import url="/WEB-INF/views/includes/footer.jsp"></c:import>
 
 	<!-- /container -->
 

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.javaex.dao.UserDao;
+import com.javaex.util.WebUtil;
 import com.javaex.vo.UserVo;
 
 
@@ -31,9 +32,10 @@ public class UserServlet extends HttpServlet {
 		String actionName = request.getParameter("a");
 
 		if ("joinform".equals(actionName)) {
+			
 			System.out.println("join form들어왔습니다.");
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/joinform.jsp");
-			rd.forward(request, response);
+			
+			WebUtil.forward(request, response, "/WEB-INF/views/user/joinform.jsp");
 
 		} else if ("join".equals(actionName)) {
 
@@ -47,15 +49,14 @@ public class UserServlet extends HttpServlet {
 			UserDao dao = new UserDao();
 			dao.insert(vo);
 
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/joinsuccess.jsp");
-			rd.forward(request, response);
+			WebUtil.forward(request, response, "/WEB-INF/views/user/joinsuccess.jsp");
 
 		} else if ("loginform".equals(actionName)) {
 
 			System.out.println("로그인 폼에 들어왔습니다.");
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/loginform.jsp");
-			rd.forward(request, response);
-
+			
+			WebUtil.forward(request, response, "/WEB-INF/views/user/loginform.jsp");
+		
 		} else if ("login".equals(actionName)) {
 
 			String email = request.getParameter("email");
@@ -68,14 +69,14 @@ public class UserServlet extends HttpServlet {
 		
 						System.out.println("실패");
 		
-						response.sendRedirect("/mysite/user?a=loginform&result=fail");
-		
+						WebUtil.redirect(response, "/mysite/user?a=loginform&result=fail");
+				
 					} else {
 						System.out.println("성공");
 						HttpSession session = request.getSession(true);
 						session.setAttribute("authUser", vo);
 		
-						response.sendRedirect("/mysite/main");
+						WebUtil.redirect(response, "/mysite/main");
 						return;
 					}
 
@@ -88,7 +89,7 @@ public class UserServlet extends HttpServlet {
 
 			session.invalidate();
 
-			response.sendRedirect("/mysite/main");
+			WebUtil.redirect(response, "/mysite/main");
 
 		} else if ("modifyform".equals(actionName)) {
 
@@ -104,9 +105,7 @@ public class UserServlet extends HttpServlet {
 
 			request.setAttribute("userVo", vo);
 			
-
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/user/modifyform.jsp");
-			rd.forward(request, response);
+			WebUtil.forward(request, response, "/WEB-INF/views/user/modifyform.jsp");
 
 		} else if ("modify".equals(actionName)) {
 			
@@ -134,12 +133,10 @@ public class UserServlet extends HttpServlet {
 			
 			dao.update(vo);
 			
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/main/index.jsp");
-			rd.forward(request, response);
+			WebUtil.forward(request, response, "/WEB-INF/views/main/index.jsp");
 			
 		} else {
-
-			response.sendRedirect("/mysite/main");
+			WebUtil.redirect(response, "/mysite/main");
 			// redirect로 다시 메인으로 보내준다.
 
 		}

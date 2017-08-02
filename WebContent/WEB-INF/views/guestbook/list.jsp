@@ -2,11 +2,7 @@
 <%@ page import = "com.javaex.dao.GuestbookDao" %>
 <%@ page import = "com.javaex.vo.GuestbookVo" %>
 <%@ page import = "java.util.List" %>
-<% 
-
-List<GuestbookVo> list = (List<GuestbookVo>)request.getAttribute("list");
-
-%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -18,11 +14,9 @@ List<GuestbookVo> list = (List<GuestbookVo>)request.getAttribute("list");
 <body>
 
 	<div id="container">
-		
-	<jsp:include page="/WEB-INF/views/includes/header.jsp"></jsp:include>
+		<c:import url="/WEB-INF/views/includes/header.jsp"></c:import>
 
-	<jsp:include page="/WEB-INF/views/includes/navigation.jsp"></jsp:include>
-
+	<c:import url="/WEB-INF/views/includes/navigation.jsp"></c:import>
 		
 		<div id="wrapper">
 			<div id="content">
@@ -45,34 +39,33 @@ List<GuestbookVo> list = (List<GuestbookVo>)request.getAttribute("list");
 						</table>
 					</form>
 					
-					<% 
-						for(GuestbookVo v:list){
-					%>
+					 
+						<c:forEach items="${list}" var="v">
+					
 					<ul>
 						<li>
 							<table>
 								<tr>
-									<td>[<%=v.getNo()%>]</td>
-									<td><%=v.getName()%></td>
-									<td><%=v.getRegDate()%></td>
-									<td><a href="/mysite/guestbook?a=deleteform&no=<%=v.getNo()%>">삭제</a></td>
+									<td>[${v.no }]</td>
+									<td>${v.name }</td>
+									<td>${v.regDate }</td>
+									<td><a href="/mysite/guestbook?a=deleteform&no=${v.no}">삭제</a></td>
 								</tr>
 								<tr>
 									<td colspan=4>
-									<%=v.getContent()%>
+									${v.content }
 									</td>
 								</tr>
 							</table>
 							<br/>
-							<% } %>
 						</li>
 					</ul>
-					
+					</c:forEach>
 				</div><!-- /guestbook -->
 			</div><!-- /content -->
 		</div><!-- /wrapper -->
 		
-	<jsp:include page="/WEB-INF/views/includes/footer.jsp"></jsp:include>
+		<c:import url="/WEB-INF/views/includes/footer.jsp"></c:import>
 		
 	</div> <!-- /container -->
 
